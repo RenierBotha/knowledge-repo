@@ -4,7 +4,7 @@
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/knowledge.db'
+# SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/knowledge.db'
 
 # Should the database tables be automatically created
 DB_AUTO_CREATE = True
