@@ -15,7 +15,8 @@ from flask import Flask, current_app, render_template, g, request, flash, redire
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_principal import Principal, identity_loaded, identity_changed, Identity, RoleNeed, UserNeed, AnonymousIdentity, PermissionDenied
+from flask_principal import Principal, identity_loaded, identity_changed, Identity, RoleNeed, UserNeed, \
+    AnonymousIdentity, PermissionDenied
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
@@ -29,7 +30,6 @@ from .index import update_index, set_up_indexing_timers, time_since_index, time_
 from .models import db as sqlalchemy_db, Post, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class KnowledgeFlask(Flask):
     def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
-                       static_folder='static')
+                       static_folder=None)
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
@@ -57,6 +57,15 @@ class KnowledgeFlask(Flask):
 
         # Add configuration passed in as keyword arguments
         self.config.update(kwargs)
+
+        self.static_folder = 'static'
+
+        if self.config['APPLICATION_ROOT'] is None:
+            self.static_url_path = '/static/'
+        else:
+            self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
+
+        self.add_url_rule(self.static_url_path + '<path:filename>', endpoint='static', view_func=self.send_static_file)
 
         # Prepare repository, and add it to the app
         if hasattr(config, 'prepare_repo'):
@@ -140,20 +149,20 @@ class KnowledgeFlask(Flask):
             self.config['mail'] = Mail(self)
 
         # Register routes to be served
-        self.register_blueprint(routes.posts.blueprint)
-        self.register_blueprint(routes.health.blueprint)
-        self.register_blueprint(routes.index.blueprint)
-        self.register_blueprint(routes.tags.blueprint)
-        self.register_blueprint(routes.vote.blueprint)
-        self.register_blueprint(routes.comment.blueprint)
-        self.register_blueprint(routes.stats.blueprint)
-        self.register_blueprint(routes.editor.blueprint)
-        self.register_blueprint(routes.groups.blueprint)
-        self.register_blueprint(routes.auth.blueprint)
+        self.register_blueprint(routes.posts.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.health.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.index.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.tags.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.vote.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.comment.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.stats.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.editor.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.groups.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.auth.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
-            self.register_blueprint(routes.debug.blueprint)
+            self.register_blueprint(routes.debug.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
 
         # Register error handler
         @self.errorhandler(500)
@@ -265,7 +274,8 @@ class KnowledgeFlask(Flask):
     @property
     def _alembic_config(self):
         if not hasattr(self, 'extensions') or 'migrate' not in self.extensions:
-            raise RuntimeError("KnowledgeApp has not yet been configured. Please instantiate it via `get_app_for_repo`.")
+            raise RuntimeError(
+                "KnowledgeApp has not yet been configured. Please instantiate it via `get_app_for_repo`.")
         migrations_path = os.path.join(os.path.dirname(__file__), "migrations")
         return self.extensions['migrate'].migrate.get_config(migrations_path)
 

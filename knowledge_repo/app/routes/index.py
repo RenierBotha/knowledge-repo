@@ -10,7 +10,7 @@ import os
 import posixpath
 import json
 from builtins import str
-from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask import request, render_template, redirect, Blueprint, current_app, make_response, url_for
 from flask_login import login_required
 from sqlalchemy import case, desc
 
@@ -48,7 +48,7 @@ def site_map():
 @blueprint.route('/')
 @PageView.logged
 def render_index():
-    return redirect('/feed')
+    return redirect(url_for("index.render_feed"))
 
 
 @blueprint.route('/favorites')
@@ -124,8 +124,8 @@ def render_cluster():
 
     excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
     post_query = (db_session.query(Post)
-                            .filter(Post.is_published)
-                            .filter(~Post.tags.any(Tag.name.in_(excluded_tags))))
+                  .filter(Post.is_published)
+                  .filter(~Post.tags.any(Tag.name.in_(excluded_tags))))
 
     if filters:
         filter_set = filters.split(" ")
@@ -147,8 +147,8 @@ def render_cluster():
     elif group_by == "tags":
         tags_to_posts = {}
         all_tags = (db_session.query(Tag)
-                              .filter(~Tag.name.in_(excluded_tags))
-                              .all())
+                    .filter(~Tag.name.in_(excluded_tags))
+                    .all())
 
         for tag in all_tags:
             tag_posts = [post for
@@ -223,10 +223,10 @@ def ajax_post_typeahead():
     match_score = sum(case_statements).label("match_score")
 
     posts = (db_session.query(Post, match_score)
-                       .filter(Post.status == current_repo.PostStatus.PUBLISHED.value)
-                       .order_by(desc(match_score))
-                       .limit(5)
-                       .all())
+             .filter(Post.status == current_repo.PostStatus.PUBLISHED.value)
+             .order_by(desc(match_score))
+             .limit(5)
+             .all())
 
     matches = []
     for (post, count) in posts:

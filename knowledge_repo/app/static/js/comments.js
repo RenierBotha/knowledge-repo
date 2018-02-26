@@ -19,7 +19,7 @@ var commentsJx = (function(){
       dataType: "json",
       data: JSON.stringify(postContent),
       contentType: "application/json",
-      url: '/comment?path=' + encodeURI(post_path),
+      url: commentsConfig.comment + '?path=' + encodeURI(post_path),
       async: false
     });
     location.reload();
@@ -29,7 +29,7 @@ var commentsJx = (function(){
   function deleteComment(post_path, comment_id){
     $.ajax({
       type:"GET",
-      url: "/delete_comment?comment_id=" + comment_id,
+      url: commentsConfig.commentDelete + "?comment_id=" + comment_id,
       async: false
     });
     location.reload();

@@ -129,7 +129,7 @@ function drawChart() {
 }
 
 function search(s){
-  window.location = '/feed?filters=' + $('#searchbar').val()
+  window.location = 'url_for("index.render_feed")?filters=' + $('#searchbar').val()
 }
 
 </script>
