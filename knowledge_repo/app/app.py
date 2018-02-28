@@ -33,6 +33,29 @@ from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+class PrefixMiddleware(object):
+
+    def __init__(self, app, prefix=''):
+        self.app = app
+        self.prefix = prefix
+
+    def __call__(self, environ, start_response):
+
+        print('\n\n...call...')
+        print(environ)
+        print('\n\n')
+
+        if environ['PATH_INFO'].startswith(self.prefix):
+            environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
+            environ['SCRIPT_NAME'] = self.prefix
+            print('environment after')
+            print(environ)
+            print('\n\n')
+            return self.app(environ, start_response)
+        else:
+            start_response('404', [('Content-Type', 'text/plain')])
+            return ["This url does not belong to the app.".encode()]
+
 
 class KnowledgeFlask(Flask):
 
@@ -40,6 +63,14 @@ class KnowledgeFlask(Flask):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static')
+
+        print('\n\nAdding hack...')
+
+
+        self.wsgi_app = PrefixMiddleware(self.wsgi_app, prefix='/knowledge_repo')
+
+        print('\n\nDone adding hack!')
+
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
