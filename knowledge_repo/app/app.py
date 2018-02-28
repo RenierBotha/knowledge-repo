@@ -49,9 +49,6 @@ class PrefixMiddleware(object):
             environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
             environ['SCRIPT_NAME'] = self.prefix
 
-            environ['HTTP_HOST'] += '/'+self.prefix
-
-
             print('environment after')
             print(environ)
             print('\n\n')
@@ -60,7 +57,6 @@ class PrefixMiddleware(object):
         elif environ['PATH_INFO'] == '/':
             start_response('301 Moved Permanently', [('Location', '/knowledge_repo/feed'),
                                                      ('Renier', True)])
-
             return ["Root url redirect...".encode()]
 
         else:
@@ -75,9 +71,9 @@ class KnowledgeFlask(Flask):
                        template_folder='templates',
                        static_folder='static')
 
-        # print('\n\nAdding hack...')
-        # self.wsgi_app = PrefixMiddleware(self.wsgi_app, prefix='/knowledge_repo')
-        # print('\n\nDone adding hack!')
+        print('\n\nAdding hack...')
+        self.wsgi_app = PrefixMiddleware(self.wsgi_app, prefix='/knowledge_repo')
+        print('\n\nDone adding hack!')
 
 
         # Add unique identifier for this application isinstance
