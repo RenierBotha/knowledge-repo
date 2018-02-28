@@ -48,10 +48,21 @@ class PrefixMiddleware(object):
         if environ['PATH_INFO'].startswith(self.prefix):
             environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
             environ['SCRIPT_NAME'] = self.prefix
+
+            environ['HTTP_HOST'] += '/'+self.prefix
+
+
             print('environment after')
             print(environ)
             print('\n\n')
             return self.app(environ, start_response)
+
+        elif environ['PATH_INFO'] == '/':
+            start_response('301 Moved Permanently', [('Location', '/knowledge_repo/feed'),
+                                                     ('Renier', True)])
+
+            return ["Root url redirect...".encode()]
+
         else:
             start_response('404', [('Content-Type', 'text/plain')])
             return ["This url does not belong to the app.".encode()]
