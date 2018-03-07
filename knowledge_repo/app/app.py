@@ -15,7 +15,8 @@ from flask import Flask, current_app, render_template, g, request, flash, redire
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_principal import Principal, identity_loaded, identity_changed, Identity, RoleNeed, UserNeed, AnonymousIdentity, PermissionDenied
+from flask_principal import Principal, identity_loaded, identity_changed, Identity, RoleNeed, UserNeed, \
+    AnonymousIdentity, PermissionDenied
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
@@ -29,39 +30,8 @@ from .index import update_index, set_up_indexing_timers, time_since_index, time_
 from .models import db as sqlalchemy_db, Post, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-class PrefixMiddleware(object):
-
-    def __init__(self, app, prefix=''):
-        self.app = app
-        self.prefix = prefix
-
-    def __call__(self, environ, start_response):
-
-        print('\n\n...call...')
-        print(environ)
-        print('\n\n')
-
-        if environ['PATH_INFO'].startswith(self.prefix):
-            environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
-            environ['SCRIPT_NAME'] = self.prefix
-
-            print('environment after')
-            print(environ)
-            print('\n\n')
-            return self.app(environ, start_response)
-
-        elif environ['PATH_INFO'] == '/':
-            start_response('301 Moved Permanently', [('Location', '/knowledge_repo/feed'),
-                                                     ('Renier', True)])
-            return ["Root url redirect...".encode()]
-
-        else:
-            start_response('404', [('Content-Type', 'text/plain')])
-            return ["This url does not belong to the app.".encode()]
 
 
 class KnowledgeFlask(Flask):
@@ -70,11 +40,6 @@ class KnowledgeFlask(Flask):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static')
-
-        # print('\n\nAdding hack...')
-        # self.wsgi_app = PrefixMiddleware(self.wsgi_app, prefix='/knowledge_repo')
-        # print('\n\nDone adding hack!')
-
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
@@ -300,7 +265,8 @@ class KnowledgeFlask(Flask):
     @property
     def _alembic_config(self):
         if not hasattr(self, 'extensions') or 'migrate' not in self.extensions:
-            raise RuntimeError("KnowledgeApp has not yet been configured. Please instantiate it via `get_app_for_repo`.")
+            raise RuntimeError(
+                "KnowledgeApp has not yet been configured. Please instantiate it via `get_app_for_repo`.")
         migrations_path = os.path.join(os.path.dirname(__file__), "migrations")
         return self.extensions['migrate'].migrate.get_config(migrations_path)
 
