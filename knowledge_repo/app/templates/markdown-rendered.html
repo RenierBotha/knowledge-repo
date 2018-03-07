@@ -90,6 +90,12 @@
 
 {% block scripts %}
 {{ super() }}
+<script type="text/javascript">
+  window.commentsConfig = {
+    comment: '{{ url_for("comments.post_comment") }}',
+    commentDelete: '{{ url_for("comments.delete_comment") }}',
+  }
+</script>
 <script src="{{ url_for('static', filename='js/helpers.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tags.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename='js/icons.js') }}" type="text/javascript"></script>
@@ -115,19 +121,14 @@
 $(document).on('ready', function(){
   // Make the Rendered Markdown Button active
   $(".tab-rendered").addClass('active');
-
   // Activate scrollspy for dynamic highlighting the table of contents
   $('body').scrollspy({ target: '.toc', offset: 71 })
-
   // Wrap all tables in a div to allow for centering with overscroll
   $('.renderedMarkdown table').wrap("<div class='table-wrapper'></div>")
-
   // Initialize headers
   helpersJx.linkifyHeaders();
-
   // Initialize comments
   var post_path = '{{ post_path }}';
-
   $("#post_comment_btn").on('click', function(){
       comment_author = '{{ username }}';
       post_author = '{{ post_author }}';
@@ -135,7 +136,6 @@ $(document).on('ready', function(){
       commentsJx.postComment(comment_author, post_author, post_title, post_path);
       location.reload();
   });
-
   all_comment_delete_buttons = $("[id^=delete_comment]")
   $.each(all_comment_delete_buttons, function(i,v){
       $(v).on("click", function(){
@@ -150,14 +150,12 @@ $(document).on('ready', function(){
   $(document.body).on('click',"button[id^=tag-subscription]",function () {
     tagsJx.addTagSubscriptionListener($(this)[0]);
   });
-
   // Add code folding
   $chunks = $('.codehilite');
   $chunks.each(function () {
 		var orig_height = $(this).get(0).scrollHeight;
 		$('pre', this).prepend("<div class=\"codetoggle\">↕</div>");
     });
-
   // function to toggle chunk visibility
   $('.codetoggle').click(function() {
     var label = $(this).html();
@@ -173,10 +171,8 @@ $(document).on('ready', function(){
 	  $(this).parent().animate({height: "35px"}, 200);
     }
   });
-
   $maindiv = $('.renderedMarkdown');
   $maindiv.prepend("<div class=\"codetoggleall\">Collapse All Code</div>");
-
   $('.codetoggleall').click(function() {
     var label = $(this).html();
     if (label.indexOf("Expand All Code") >= 0) {
@@ -200,7 +196,6 @@ $(document).on('ready', function(){
     }
   });
 })
-
 //Turn all the headers to be links
 //h1 = Title, don't want that
 var all_headers = [$("h2"), $("h3"), $("h4"), $("h5"), $("h6")]
@@ -212,7 +207,6 @@ $.each(all_headers, function(index, value){
     v.innerHTML = "<a href='" + inner_link + "' class=link-reset>" + inner_html + "</a>"
   })
 })
-
 //turn all the tags into links, similar to what's done on the feed page
 var tags = $(".renderedMarkdown .metadata .tags")[0]
 var tags_list = {{ tags_list|safe }}
@@ -264,9 +258,7 @@ $.each(tags_list, function(i,tag){
   }
 })
 tags.nextSibling.remove()
-
 tags.innerHTML += "<i class='glyphicon glyphicon-edit icon-gray' style='font-size:12pt; padding-left:4px' id='tooltip-edit_tags'></i>"
-
 $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
   .on("mouseenter", function () {
       var _this = this;
@@ -282,7 +274,6 @@ $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100}
           }
       }, 300);
 });
-
 $('#tooltip-edit_tags').click(function(){
   $('#tooltip-edit_tags')[0].setAttribute("style", "display:none")
   previousSibling = $("#tooltip-edit_tags")[0].previousSibling
@@ -305,12 +296,9 @@ $('#tooltip-edit_tags').click(function(){
   form.appendChild(input)
   form.appendChild(icon_class)
   tags.appendChild(form)
-
-
   $("#tooltip-save_tags").click(function(){
     tags_string = $("#change_tags")[0].value
     tags_list = tags_string.split(",")
-
     var re = /^[a-z0-9\-\_\:\/]+$/i
     var good = true
     for (var i = 0; i < tags_list.length; i++){
@@ -342,32 +330,23 @@ $('#tooltip-edit_tags').click(function(){
       location.reload()
     }
   })
-
   tags.nextSibling.remove()
-
   // Allow user to edit tags
   var edit_icon = iconsJx.createEditTagsIcon();
   $(tags).after(edit_icon);
-
   $("#tooltip-edit_tags").on("click", function(){
       var edit_tooltip = $("#tooltip-edit_tags");
       edit_tooltip.attr("style", "display:none");
-
       var tags_string = tags_list.join(", ");
       var form = $("<form>");
       var input = $("<input>");
-
       var tags_text = $("<text>");
       tags_text.html("Tags: ");
-
-
       var icon = iconsJx.createSaveTagsIcon();
-
       input.attr("type", "text");
       input.attr("name", "tags_list");
       input.attr("style", "width:75%; display: inline-block");
       input.attr("id", "change_tags");
-
       form.append(tags_text);
       tags.textContent = " ";
       tags_text.innerHTML = "Tags: ";
@@ -375,8 +354,6 @@ $('#tooltip-edit_tags').click(function(){
       form.append(icon);
       tags.appendChild(form[0]);
       $("#change_tags")[0].value = tags_string;
-
-
       $("#change_tags").keypress(function(e){
           if (e.which == 13){
               var tags_string = $("#change_tags")[0].value;
@@ -385,14 +362,11 @@ $('#tooltip-edit_tags').click(function(){
               return false;
           };
       });
-
-
       $("#tooltip-save_tags").click(function(){
           var tags_string = $("#change_tags")[0].value;
           var post_path = "{{ post_path|urlencode }}";
           tagsJx.changeAndSaveTags(post_path, tags_string);
       });
-
        $("form").submit(function(){
           var tags_string = $("#change_tags")[0].value;
           var post_path = "{{ post_path|urlencode }}";
@@ -400,8 +374,6 @@ $('#tooltip-edit_tags').click(function(){
           return false
       })
   });
-
 });
-
 </script>
 {% endblock %}

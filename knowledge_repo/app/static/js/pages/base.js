@@ -22,7 +22,7 @@ $(document).ready(function() {
             }
         },
         source: function(q, sync, async) {
-            $.ajax('/ajax/index/typeahead?search=' + q, {
+            $.ajax( baseConfig.typeahead + '?search=' + q, {
                 success: function(data, status) {
                     async(JSON.parse(data));
                 }
@@ -32,14 +32,14 @@ $(document).ready(function() {
 
 
     $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
-        window.location = '/post/' + encodeURIComponent(datum.path);
+        window.location = baseConfig.root + '/post/' + encodeURIComponent(datum.path);
     });
 
     $('#searchbar').keypress(function(event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') {
             var path = document.location.pathname;
-            window.location = '/feed?filters=' + $('#searchbar').val()
+            window.location = baseConfig.feed + '?filters=' + $('#searchbar').val()
         }
     });
 

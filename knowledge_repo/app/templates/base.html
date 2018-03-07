@@ -21,6 +21,13 @@
     <!-- require js is used for plotly, but has a bunch of collisions with other js packages
              make sure to have it be last js package imported -->
     <script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
+    <script type="text/javascript">
+      window.baseConfig = {
+        typeahead: '{{ url_for("index.ajax_post_typeahead") }}',
+        feed: '{{ url_for("index.render_feed") }}',
+        root: '{{ url_for("index.render_index") }}'
+      }
+    </script>
     <script src="{{ url_for('static', filename='js/pages/base.js')}}"></script>
 
     <!--[if lt IE 9]>
@@ -57,7 +64,7 @@
           </button>
 
           <!-- Brand name / logo -->
-          <a class="navbar-brand" href="/" class="logo-image">
+          <a class="navbar-brand" href='{{ url_for("index.render_index") }}' class="logo-image">
             <img style='height:100%;' src='{{ url_for("static", filename = "images/logo-white.svg")}}' />
           </a>
         </div>
@@ -76,7 +83,7 @@
           </form>
 
           <!-- "Write a Post" button -->
-          <a href="/create" class="btn btn-primary navbar-button">
+          <a href='{{ url_for("index.create") }}' class="btn btn-primary navbar-button">
             Write a Post!
           </a>
 
@@ -90,8 +97,8 @@
               <ul class="dropdown-menu">
                 {% if current_user.is_authenticated %}
                 <li class="dropdown-header">Logged in as <em>{{ current_user.format_name }}</em></li>
-                <li><a href="/feed?authors={{ current_user.identifier }}">My Posts</a></li>
-                <li><a href="/favorites">My Favorites</a></li>
+                <li><a href='{{ url_for("index.render_feed") }}?authors={{ current_user.identifier }}'>My Posts</a></li>
+                <li><a href='{{ url_for("index.render_favorites") }}'>My Favorites</a></li>
                 {% if current_user.can_logout %}
                 <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
                 {% endif %}
@@ -100,8 +107,8 @@
                 {% else %}
                 <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
                 {% endif %}
-                <li><a href="/stats">Stats</a></li>
-                <li><a href="/about">About</a></li>
+                <li><a href='{{ url_for("stats.stats") }}'>Stats</a></li>
+                <li><a href='{{ url_for("posts.about") }}'>About</a></li>
               </ul>
             </li>
           </ul>
@@ -110,12 +117,12 @@
           <ul class="nav navbar-nav navbar-right visible-xs-block">
             {% if current_user.is_authenticated %}
             <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
-            <li><a href="/feed?authors={{username}}">My Posts</a></li>
-            <li><a href="/favorites">My Favorites</a></li><li role="separator" class="divider"></li>
+            <li><a href='{{ url_for("index.render_feed") }}?authors={{username}}'>My Posts</a></li>
+            <li><a href='{{ url_for("index.render_favorites") }}'>My Favorites</a></li><li role="separator" class="divider"></li>
             <li class="dropdown-header">Site Features</li>
             {% endif %}
-            <li><a id="stats_tab" href="/stats">Stats</a></li>
-            <li><a id="help_tab" href="/about">About</a></li>
+            <li><a id="stats_tab" href='{{ url_for("stats.stats") }}'>Stats</a></li>
+            <li><a id="help_tab" href='{{ url_for("posts.about") }}'>About</a></li>
           </ul>
 
         </div>

@@ -48,7 +48,7 @@ function initializeTooltips(is_webeditor, post_id, id, data_repo_github_root){
         $("#tooltip-like").click(function() {
             $.ajax({
                 type: "GET",
-                url: '/like?post_id=' + post_id,
+                url: tooltipsConfig.like + '?post_id=' + post_id,
                 async: false
             });
             location.reload();
@@ -61,7 +61,7 @@ function initializeTooltips(is_webeditor, post_id, id, data_repo_github_root){
         $("#tooltip-unlike").click(function() {
             $.ajax({
                 type: "GET",
-                url: '/unlike?post_id=' + post_id,
+                url: tooltipsConfig.unlike + '?post_id=' + post_id,
                 async: false
             });
         location.reload();

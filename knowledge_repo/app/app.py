@@ -39,7 +39,7 @@ class KnowledgeFlask(Flask):
     def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
-                       static_folder='static')
+                       static_folder=None)  # this is set to None so that static url path is not defined by flask
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
@@ -57,6 +57,26 @@ class KnowledgeFlask(Flask):
 
         # Add configuration passed in as keyword arguments
         self.config.update(kwargs)
+
+        # To set the static url path
+        self.static_folder = 'static'
+
+        print('\n\nConfig = {}\n\n'.format(self.config))
+
+
+        if self.config['APPLICATION_ROOT'] is None:
+
+            self.static_url_path = '/static/'
+        else:
+
+            self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
+
+            print('FOUND APPLICATION ROOT!! SETTING static_url_path to ',self.static_url_path)
+
+
+        self.add_url_rule(self.static_url_path + '<path:filename>',
+                          endpoint='static',
+                          view_func=self.send_static_file)
 
         # Prepare repository, and add it to the app
         if hasattr(config, 'prepare_repo'):
@@ -140,20 +160,20 @@ class KnowledgeFlask(Flask):
             self.config['mail'] = Mail(self)
 
         # Register routes to be served
-        self.register_blueprint(routes.posts.blueprint)
-        self.register_blueprint(routes.health.blueprint)
-        self.register_blueprint(routes.index.blueprint)
-        self.register_blueprint(routes.tags.blueprint)
-        self.register_blueprint(routes.vote.blueprint)
-        self.register_blueprint(routes.comment.blueprint)
-        self.register_blueprint(routes.stats.blueprint)
-        self.register_blueprint(routes.editor.blueprint)
-        self.register_blueprint(routes.groups.blueprint)
-        self.register_blueprint(routes.auth.blueprint)
+        self.register_blueprint(routes.posts.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.health.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.index.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.tags.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.vote.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.comment.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.stats.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.editor.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.groups.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.auth.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
-            self.register_blueprint(routes.debug.blueprint)
+            self.register_blueprint(routes.debug.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
 
         # Register error handler
         @self.errorhandler(500)

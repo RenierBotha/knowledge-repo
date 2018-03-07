@@ -39,12 +39,9 @@
 <script type="text/javascript">
 google.load('visualization', '1', {'packages':['corechart']});
 google.setOnLoadCallback(drawChart);
-
 function drawChart() {
-
   var height = 500;
   var hAxisOpts = {format: 'y-MM-dd', slantedText:true, slantedTextAngle: 40, title:'Date'}
-
   // Daily PageViews
   var data = new google.visualization.DataTable();
   data.addColumn('date', 'Day');
@@ -60,7 +57,6 @@ function drawChart() {
                     colors: ['#ff5a5f'],
                     height: height,
                     hAxis: hAxisOpts});
-
   // Weekly Posts
   var data = new google.visualization.DataTable();
   data.addColumn('date', 'Week');
@@ -77,7 +73,6 @@ function drawChart() {
                     colors: ['#ff5a5f','#ffb400'],
                     height: height,
                     hAxis: hAxisOpts});
-
   // Weekly Posts Cumulative
   var data = new google.visualization.DataTable();
   data.addColumn('date', 'Week');
@@ -93,7 +88,6 @@ function drawChart() {
                     colors: ['#ff5a5f'],
                     height: height,
                     hAxis: hAxisOpts});
-
   // Weekly PageViews
   var data = new google.visualization.DataTable();
   data.addColumn('date', 'Week');
@@ -109,7 +103,6 @@ function drawChart() {
                     colors: ['#007a87'],
                     height: height,
                     hAxis: hAxisOpts});
-
   // Number of posts per author
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Author');
@@ -125,13 +118,10 @@ function drawChart() {
                     colors: ['#007a87'],
                     height: height,
                     });
-
 }
-
 function search(s){
-  window.location = '/feed?filters=' + $('#searchbar').val()
+  window.location = 'url_for("index.render_feed")?filters=' + $('#searchbar').val()
 }
-
 </script>
 
 {% endblock %}
