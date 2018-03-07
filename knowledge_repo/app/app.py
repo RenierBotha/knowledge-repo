@@ -71,9 +71,9 @@ class KnowledgeFlask(Flask):
                        template_folder='templates',
                        static_folder='static')
 
-        print('\n\nAdding hack...')
-        self.wsgi_app = PrefixMiddleware(self.wsgi_app, prefix='/knowledge_repo')
-        print('\n\nDone adding hack!')
+        # print('\n\nAdding hack...')
+        # self.wsgi_app = PrefixMiddleware(self.wsgi_app, prefix='/knowledge_repo')
+        # print('\n\nDone adding hack!')
 
 
         # Add unique identifier for this application isinstance
