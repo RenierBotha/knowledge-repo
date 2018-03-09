@@ -109,6 +109,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     @property
     def git_remote(self):
         if self.git_has_remote:
+            logger.warning('Git remote name: ',self.config.remote_name)
             return self.git.remote(self.config.remote_name)
         return None
 

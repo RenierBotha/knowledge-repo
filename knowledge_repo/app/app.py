@@ -61,18 +61,10 @@ class KnowledgeFlask(Flask):
         # To set the static url path
         self.static_folder = 'static'
 
-        print('\n\nConfig = {}\n\n'.format(self.config))
-
-
         if self.config['APPLICATION_ROOT'] is None:
-
             self.static_url_path = '/static/'
         else:
-
             self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
-
-            print('FOUND APPLICATION ROOT!! SETTING static_url_path to ',self.static_url_path)
-
 
         self.add_url_rule(self.static_url_path + '<path:filename>',
                           endpoint='static',
@@ -174,7 +166,6 @@ class KnowledgeFlask(Flask):
 
         if self.config['DEBUG']:
             self.register_blueprint(routes.debug.blueprint, url_prefix=self.config['APPLICATION_ROOT'])
-
         # Register error handler
         @self.errorhandler(500)
         def show_traceback(self):
